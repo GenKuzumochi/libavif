@@ -47,6 +47,7 @@ jobs:
           directory: build
           path: |
             avifenc
+            avifencEx
             avifdec
             avifgainmaputil
       - name: Upload artifacts
