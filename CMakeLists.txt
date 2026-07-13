@@ -120,6 +120,7 @@ set_local_or_system_option(
 )
 
 option(AVIF_BUILD_APPS "Build avif apps." OFF)
+option(AVIF_BUILD_AVIFENCEX "Build avifencEx (the extended version of avifenc with --filelist support)." OFF)
 option(AVIF_BUILD_TESTS "Build avif tests." OFF)
 option(
     AVIF_ENABLE_COMPLIANCE_WARDEN
@@ -633,7 +634,7 @@ if(CMAKE_SKIP_INSTALL_RULES)
     set(SKIP_INSTALL_ALL TRUE)
 endif()
 
-if(AVIF_BUILD_APPS OR (AVIF_BUILD_TESTS AND (AVIF_FUZZTEST OR AVIF_GTEST)))
+if(AVIF_BUILD_APPS OR AVIF_BUILD_AVIFENCEX OR (AVIF_BUILD_TESTS AND (AVIF_FUZZTEST OR AVIF_GTEST)))
     if(AVIF_ZLIBPNG STREQUAL "OFF")
         message(FATAL_ERROR "libavif: AVIF_ZLIBPNG cannot be OFF when AVIF_BUILD_APPS or AVIF_BUILD_TESTS is ON")
     elseif(AVIF_ZLIBPNG STREQUAL "SYSTEM")
@@ -686,6 +687,31 @@ if(AVIF_BUILD_APPS OR (AVIF_BUILD_TESTS AND (AVIF_FUZZTEST OR AVIF_GTEST)))
     endif()
 endif()
 
+if(AVIF_BUILD_AVIFENCEX)
+    add_executable(avifencEx apps/avifencEx.c)
+    if(WIN32)
+        if(MSVC)
+            target_sources(avifencEx PRIVATE apps/utf8.manifest)
+        elseif(MINGW)
+            # MinGW doesn't have a manifest tool (mt.exe), so we need to wrap
+            # utf8.manifest in a resource-definition script (.rc file).
+            target_sources(avifencEx PRIVATE apps/utf8.rc)
+        endif()
+    endif()
+    if(AVIF_LIB_USE_CXX)
+        set_target_properties(avifencEx PROPERTIES LINKER_LANGUAGE "CXX")
+    endif()
+    target_link_libraries(avifencEx avif_apps avif avif_enable_warnings)
+
+    if(NOT SKIP_INSTALL_APPS AND NOT SKIP_INSTALL_ALL)
+        install(
+            TARGETS avifencEx
+            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
+            ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+            LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+        )
+    endif()
+endif()
 if(AVIF_BUILD_APPS)
     add_executable(avifenc apps/avifenc.c)
     if(WIN32)
