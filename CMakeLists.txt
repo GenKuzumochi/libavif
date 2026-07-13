@@ -687,7 +687,7 @@ if(AVIF_BUILD_APPS OR AVIF_BUILD_AVIFENCEX OR (AVIF_BUILD_TESTS AND (AVIF_FUZZTE
     endif()
 endif()
 
-if(AVIF_BUILD_AVIFENCEX)
+if(AVIF_BUILD_APPS OR AVIF_BUILD_AVIFENCEX)
     add_executable(avifencEx apps/avifencEx.c)
     if(WIN32)
         if(MSVC)
