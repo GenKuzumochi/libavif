@@ -1,12 +1,8 @@
 # This workflow generates artifacts such as avifenc and avifdec for convenience.
 
-name: CI macOS Release Artifacts
+name: CI macOS Artifacts
 on:
-  release:
-    types: [created]
-
-permissions:
-  contents: write
+  push:
 
 jobs:
   build-macos-artifacts:
@@ -62,14 +58,7 @@ jobs:
             avifgainmaputil
             README.txt
       - name: Upload artifacts
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$RELEASE_TAG" "build/${{ runner.os }}-artifacts.zip"
-
-    # Use the following instead of the above to test this workflow outside of a release event.
-    # - name: Upload artifacts
-    #   uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
-    #   with:
-    #     name: ${{ runner.os }}-artifacts.zip
-    #     path: build/${{ runner.os }}-artifacts.zip
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
+        with:
+          name: ${{ runner.os }}-artifacts
+          path: build/${{ runner.os }}-artifacts.zip
